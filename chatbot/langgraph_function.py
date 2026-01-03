@@ -12,7 +12,7 @@ class ChatAttribute(TypedDict):
     human_message: str
 
 # The chatbot function
-def langGraphChatbot(state: ChatAttribute, query: str, temperature: float, max_output_tokens: int) -> ChatAttribute:
+def chatting(state: ChatAttribute, query: str, temperature: float, max_output_tokens: int) -> ChatAttribute:
     # Initialize LLM
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
@@ -33,13 +33,13 @@ def langGraphChatbot(state: ChatAttribute, query: str, temperature: float, max_o
     return state
 
 # Main function: pass everything dynamically
-def main(query: str, temperature: float = 0.7, max_output_tokens: int = 500):
+def langGraphChatbot(query: str, temperature: float = 0.7, max_output_tokens: int = 500):
     # Create StateGraph
     graph = StateGraph(ChatAttribute)
 
     # Wrap the chatbot function so StateGraph only passes 'state'
     node_function = partial(
-        langGraphChatbot,
+        chatting,
         query=query,
         temperature=temperature,
         max_output_tokens=max_output_tokens
@@ -58,8 +58,10 @@ def main(query: str, temperature: float = 0.7, max_output_tokens: int = 500):
 
     # Invoke workflow
     final_state = workflow.invoke(initial_state)
-    print("AI Response:", final_state['AI_message'])
+    # print("AI Response:", final_state['AI_message'])
+
+    return final_state['AI_message']
 
 # Call main dynamically
 if __name__ == "__main__":
-    main(query="Explain large language models in simple terms", temperature=0.9, max_output_tokens=400)
+    langGraphChatbot(query="Explain large language models in simple terms", temperature=0.9, max_output_tokens=400)
